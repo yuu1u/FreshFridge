@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
-
 android {
     namespace = "com.example.freshfridge"
     compileSdk {
@@ -60,4 +60,7 @@ dependencies {
 
 // 生命周期感知
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
+    // Room 数据库
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
 }

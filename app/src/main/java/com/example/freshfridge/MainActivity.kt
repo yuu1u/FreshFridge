@@ -1,14 +1,29 @@
 package com.example.freshfridge
-
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.freshfridge.viewmodel.IngredientViewModel
 import android.os.Bundle
+import androidx.compose.runtime.getValue
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,22 +45,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-data class Ingredient(
-    val name: String,
-    val amount: String,
-    val expire: String
-)
 
 @Composable
 fun FreshFridgeHome() {
+    val ingredientViewModel: IngredientViewModel = viewModel()
 
-    val ingredients = listOf(
-        Ingredient("牛奶", "1 瓶", "今天过期"),
-        Ingredient("鸡蛋", "6 个", "还剩 3 天"),
-        Ingredient("西红柿", "3 个", "还剩 5 天"),
-        Ingredient("西兰花", "1 颗", "还剩 2 天"),
-        Ingredient("苹果", "4 个", "还剩 7 天")
-    )
+    val ingredients by ingredientViewModel.allIngredients
+        .collectAsStateWithLifecycle()
+
 
     Scaffold(
         containerColor = Color(0xFFF5F8F3),
@@ -249,19 +256,15 @@ fun IngredientItem(ingredient: Ingredient) {
                 )
 
                 Text(
-                    text = ingredient.amount,
+                    text = "${ingredient.amount} ${ingredient.unit}",
                     color = Color.Gray,
                     fontSize = 13.sp
                 )
             }
 
             Text(
-                text = ingredient.expire,
-                color = if (ingredient.expire == "今天过期") {
-                    Color(0xFFD32F2F)
-                } else {
-                    Color(0xFF558B2F)
-                },
+                text = ingredient.expiryDate,
+                color = Color(0xFF558B2F),
                 fontSize = 13.sp
             )
         }
