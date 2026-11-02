@@ -31,7 +31,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +48,34 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private fun getDaysUntilExpiry(expiryDate: String): Long? {
+    return try {
+        val format = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
+            isLenient = false
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
 
+        val expiry = format.parse(expiryDate) ?: return null
+
+        // 获取今天的年月日
+        val localToday = Calendar.getInstance()
+
+        // 使用 UTC 计算日期差，避免夏令时影响
+        val today = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        today.clear()
+        today.set(
+            localToday.get(Calendar.YEAR),
+            localToday.get(Calendar.MONTH),
+            localToday.get(Calendar.DAY_OF_MONTH)
+        )
+
+        val difference = expiry.time - today.timeInMillis
+
+        difference / (24 * 60 * 60 * 1000)
+    } catch (e: Exception) {
+        null
+    }
+}
 @Composable
 fun FreshFridgeHome() {
     val ingredientViewModel: IngredientViewModel = viewModel()
@@ -53,7 +83,19 @@ fun FreshFridgeHome() {
     val ingredients by ingredientViewModel.allIngredients
         .collectAsStateWithLifecycle()
 
+// 首页动态统计
+    val totalCount = ingredients.size
+// 即将过期：今天到未来3天内过期
+    val expiringCount = ingredients.count { ingredient ->
+        val days = getDaysUntilExpiry(ingredient.expiryDate)
+        days != null && days in 0..3
+    }
 
+// 已过期：过期日期早于今天
+    val expiredCount = ingredients.count { ingredient ->
+        val days = getDaysUntilExpiry(ingredient.expiryDate)
+        days != null && days < 0
+    }
     Scaffold(
         containerColor = Color(0xFFF5F8F3),
         bottomBar = {
@@ -130,21 +172,21 @@ fun FreshFridgeHome() {
                 ) {
                     SummaryCard(
                         title = "食材总数",
-                        number = "15",
+                        number = totalCount.toString(),
                         color = Color(0xFFE8F5E9),
                         modifier = Modifier.weight(1f)
                     )
 
                     SummaryCard(
                         title = "即将过期",
-                        number = "3",
+                        number = expiringCount.toString(),
                         color = Color(0xFFFFF3E0),
                         modifier = Modifier.weight(1f)
                     )
 
                     SummaryCard(
                         title = "已过期",
-                        number = "1",
+                        number = expiringCount.toString(),
                         color = Color(0xFFFFEBEE),
                         modifier = Modifier.weight(1f)
                     )
@@ -249,6 +291,14 @@ fun IngredientItem(ingredient: Ingredient) {
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+                val days = getDaysUntilExpiry(ingredient.expiryDate)
+
+                val expiryText = when {
+                    days == null -> "日期无效"
+                    days < 0 -> "已过期 ${-days} 天"
+                    days == 0L -> "今天过期"
+                    else -> "还剩 $days 天"
+                }
                 Text(
                     text = ingredient.name,
                     fontSize = 17.sp,
@@ -260,13 +310,17 @@ fun IngredientItem(ingredient: Ingredient) {
                     color = Color.Gray,
                     fontSize = 13.sp
                 )
-            }
 
-            Text(
-                text = ingredient.expiryDate,
-                color = Color(0xFF558B2F),
-                fontSize = 13.sp
-            )
+
+                Text(
+                    text = expiryText,
+                    color = Color(0xFF558B2F),
+                    fontSize = 13.sp
+
+                )
+
+            }
         }
+
     }
 }
