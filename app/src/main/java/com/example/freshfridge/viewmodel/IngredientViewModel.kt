@@ -84,6 +84,9 @@ class IngredientViewModel(application: Application) : AndroidViewModel(applicati
             initialValue = emptyList()
         )
 
+
+
+
     // 添加食材
     fun insertIngredient(ingredient: Ingredient) {
         viewModelScope.launch {
@@ -96,6 +99,7 @@ class IngredientViewModel(application: Application) : AndroidViewModel(applicati
     fun updateIngredient(ingredient: Ingredient) {
         viewModelScope.launch {
             repository.updateIngredient(ingredient)
+            _ingredientCount.value = repository.getIngredientCount()
         }
     }
 

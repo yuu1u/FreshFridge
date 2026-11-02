@@ -28,8 +28,9 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         compose = true
@@ -54,7 +55,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     // 页面导航
     implementation("androidx.navigation:navigation-compose:2.10.2")
-
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
 
