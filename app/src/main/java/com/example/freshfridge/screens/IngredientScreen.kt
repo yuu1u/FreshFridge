@@ -17,7 +17,8 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun IngredientScreen(
     viewModel: IngredientViewModel,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
+    onEditClick: (Ingredient) -> Unit
 ) {
     val ingredients by viewModel.allIngredients.collectAsStateWithLifecycle()
 
@@ -56,9 +57,18 @@ fun IngredientScreen(
             ) {
                 items(
                     items = ingredients,
-                    key = { ingredient -> ingredient.id }
+                    key = { it.id }
                 ) { ingredient ->
-                    IngredientCard(ingredient)
+
+                    IngredientCard(
+                        ingredient = ingredient,
+                        onEditClick = {
+                            onEditClick(ingredient)
+                        },
+                        onDeleteClick = {
+                            viewModel.deleteIngredient(ingredient)
+                        }
+                    )
                 }
             }
         }
@@ -66,8 +76,11 @@ fun IngredientScreen(
 }
 
 @Composable
-private fun IngredientCard(ingredient: Ingredient) {
-
+private fun IngredientCard(
+    ingredient: Ingredient,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     val days = calculateDays(ingredient.expiryDate)
 
     val expiryText = when {
@@ -80,22 +93,44 @@ private fun IngredientCard(ingredient: Ingredient) {
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = ingredient.name,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = ingredient.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
 
-            Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-            Text("${ingredient.amount} ${ingredient.unit}")
+                Text("${ingredient.amount} ${ingredient.unit}")
 
-            Text(
-                text = expiryText,
-                color = MaterialTheme.colorScheme.secondary
-            )
+                Text("过期时间：${ingredient.expiryDate}")
+
+                Text(
+                    text = expiryText,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            Column {
+                TextButton(onClick = onEditClick) {
+                    Text("编辑")
+                }
+
+                TextButton(onClick = onDeleteClick) {
+                    Text(
+                        text = "删除",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
 }
@@ -110,13 +145,5 @@ private fun calculateDays(expiryDate: String): Long? {
             ?.groupValues
             ?.get(1)
             ?.toLongOrNull()
-    }
-}
-private fun getDaysUntilExpiry(expiryDate: String): Long? {
-    return try {
-        val expiry = LocalDate.parse(expiryDate)
-        ChronoUnit.DAYS.between(LocalDate.now(), expiry)
-    } catch (e: Exception) {
-        null
     }
 }

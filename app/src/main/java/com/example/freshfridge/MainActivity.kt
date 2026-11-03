@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.freshfridge.screens.AddingIngredientScreen
+import com.example.freshfridge.screens.EditIngredientScreen
 import com.example.freshfridge.screens.IngredientScreen
 import com.example.freshfridge.viewmodel.IngredientViewModel
 import java.text.SimpleDateFormat
@@ -80,6 +81,11 @@ fun FreshFridgeApp() {
 
     var currentScreen by rememberSaveable {
         mutableStateOf("home")
+    }
+
+    // 当前选中的食材，用于编辑页面
+    var selectedIngredient by remember {
+        mutableStateOf<Ingredient?>(null)
     }
 
     Scaffold(
@@ -147,8 +153,14 @@ fun FreshFridgeApp() {
                 "ingredients" -> {
                     IngredientScreen(
                         viewModel = ingredientViewModel,
+
                         onAddClick = {
                             currentScreen = "add"
+                        },
+
+                        onEditClick = { ingredient ->
+                            selectedIngredient = ingredient
+                            currentScreen = "edit"
                         }
                     )
                 }
@@ -161,6 +173,22 @@ fun FreshFridgeApp() {
                             currentScreen = "ingredients"
                         }
                     )
+                }
+
+                // 编辑食材页面
+                "edit" -> {
+                    selectedIngredient?.let { ingredient ->
+
+                        EditIngredientScreen(
+                            ingredient = ingredient,
+                            viewModel = ingredientViewModel,
+
+                            onBack = {
+                                currentScreen = "ingredients"
+                                selectedIngredient = null
+                            }
+                        )
+                    }
                 }
 
                 // 菜谱页面（后续开发）
