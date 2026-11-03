@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.freshfridge.screens.AddingIngredientScreen
+import com.example.freshfridge.screens.CookingHistoryScreen
 import com.example.freshfridge.screens.EditIngredientScreen
 import com.example.freshfridge.screens.IngredientScreen
 import com.example.freshfridge.screens.RecipeScreen
@@ -85,12 +86,12 @@ fun FreshFridgeApp() {
         mutableStateOf("home")
     }
 
-    // 当前选中的食材，用于编辑页面
+    // 当前选中的食材
     var selectedIngredient by remember {
         mutableStateOf<Ingredient?>(null)
     }
 
-    // 当前选中的菜谱，用于详情页面
+    // 当前选中的菜谱
     var selectedRecipe by remember {
         mutableStateOf<Recipe?>(null)
     }
@@ -128,6 +129,15 @@ fun FreshFridgeApp() {
                     },
                     icon = { Text("🍳") },
                     label = { Text("菜谱") }
+                )
+
+                NavigationBarItem(
+                    selected = currentScreen == "history",
+                    onClick = {
+                        currentScreen = "history"
+                    },
+                    icon = { Text("📖") },
+                    label = { Text("记录") }
                 )
 
                 NavigationBarItem(
@@ -224,14 +234,31 @@ fun FreshFridgeApp() {
                                 selectedRecipe = null
                             },
 
+                            // 开始烹饪：保存记录并跳转
                             onStartCooking = {
-                                // 下一阶段实现开始烹饪和烹饪记录
+
+                                ingredientViewModel.insertCookingRecord(
+                                    CookingRecord(
+                                        recipeName = recipe.name,
+                                        cookingTime = recipe.cookingTime
+                                    )
+                                )
+
+                                selectedRecipe = null
+                                currentScreen = "history"
                             }
                         )
                     }
                 }
 
-                // 我的页面（后续开发）
+                // 烹饪记录页面
+                "history" -> {
+                    CookingHistoryScreen(
+                        viewModel = ingredientViewModel
+                    )
+                }
+
+                // 我的页面
                 "profile" -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -370,8 +397,7 @@ fun FreshFridgeHome(
                     Text(
                         text = "🎉 暂时没有即将过期的食材",
                         modifier = Modifier.padding(16.dp),
-                        color = Color(0xFF2E7D32),
-                        fontSize = 14.sp
+                        color = Color(0xFF2E7D32)
                     )
                 }
             }
