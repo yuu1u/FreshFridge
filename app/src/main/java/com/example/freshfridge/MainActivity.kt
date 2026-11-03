@@ -1,5 +1,5 @@
 package com.example.freshfridge
-import com.example.freshfridge.screens.RecipeScreen
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,6 +21,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.freshfridge.screens.AddingIngredientScreen
 import com.example.freshfridge.screens.EditIngredientScreen
 import com.example.freshfridge.screens.IngredientScreen
+import com.example.freshfridge.screens.RecipeScreen
+import com.example.freshfridge.screens.RecipeDetailScreen
 import com.example.freshfridge.viewmodel.IngredientViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -88,6 +90,11 @@ fun FreshFridgeApp() {
         mutableStateOf<Ingredient?>(null)
     }
 
+    // 当前选中的菜谱，用于详情页面
+    var selectedRecipe by remember {
+        mutableStateOf<Recipe?>(null)
+    }
+
     Scaffold(
         containerColor = Color(0xFFF5F8F3),
 
@@ -113,9 +120,11 @@ fun FreshFridgeApp() {
                 )
 
                 NavigationBarItem(
-                    selected = currentScreen == "recipes",
+                    selected = currentScreen == "recipes" ||
+                            currentScreen == "recipe_detail",
                     onClick = {
                         currentScreen = "recipes"
+                        selectedRecipe = null
                     },
                     icon = { Text("🍳") },
                     label = { Text("菜谱") }
@@ -194,8 +203,32 @@ fun FreshFridgeApp() {
                 // 智能菜谱推荐页面
                 "recipes" -> {
                     RecipeScreen(
-                        viewModel = ingredientViewModel
+                        viewModel = ingredientViewModel,
+
+                        onRecipeClick = { recipe ->
+                            selectedRecipe = recipe
+                            currentScreen = "recipe_detail"
+                        }
                     )
+                }
+
+                // 菜谱详情页面
+                "recipe_detail" -> {
+                    selectedRecipe?.let { recipe ->
+
+                        RecipeDetailScreen(
+                            recipe = recipe,
+
+                            onBack = {
+                                currentScreen = "recipes"
+                                selectedRecipe = null
+                            },
+
+                            onStartCooking = {
+                                // 下一阶段实现开始烹饪和烹饪记录
+                            }
+                        )
+                    }
                 }
 
                 // 我的页面（后续开发）

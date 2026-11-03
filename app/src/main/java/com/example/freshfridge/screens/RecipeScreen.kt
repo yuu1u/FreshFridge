@@ -1,5 +1,6 @@
 package com.example.freshfridge.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,7 +18,8 @@ import java.time.temporal.ChronoUnit
 
 @Composable
 fun RecipeScreen(
-    viewModel: IngredientViewModel
+    viewModel: IngredientViewModel,
+    onRecipeClick: (Recipe) -> Unit
 ) {
     val ingredients by viewModel.allIngredients.collectAsStateWithLifecycle()
 
@@ -77,7 +79,10 @@ fun RecipeScreen(
                 ) { recommendation ->
 
                     RecipeCard(
-                        recommendation = recommendation
+                        recommendation = recommendation,
+                        onClick = {
+                            onRecipeClick(recommendation.recipe)
+                        }
                     )
                 }
             }
@@ -173,12 +178,17 @@ private fun isExpiringSoon(expiryDate: String): Boolean {
 // 菜谱卡片
 @Composable
 private fun RecipeCard(
-    recommendation: RecipeRecommendation
+    recommendation: RecipeRecommendation,
+    onClick: () -> Unit
 ) {
     val recipe = recommendation.recipe
 
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -261,6 +271,14 @@ private fun RecipeCard(
             recipe.steps.forEachIndexed { index, step ->
                 Text("${index + 1}. $step")
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "点击查看菜谱详情 →",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelLarge
+            )
         }
     }
 }
