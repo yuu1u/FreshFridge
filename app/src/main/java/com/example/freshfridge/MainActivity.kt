@@ -1,5 +1,5 @@
 package com.example.freshfridge
-
+import com.example.freshfridge.screens.RecipeScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -191,14 +191,11 @@ fun FreshFridgeApp() {
                     }
                 }
 
-                // 菜谱页面（后续开发）
+                // 智能菜谱推荐页面
                 "recipes" -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("菜谱功能正在开发中")
-                    }
+                    RecipeScreen(
+                        viewModel = ingredientViewModel
+                    )
                 }
 
                 // 我的页面（后续开发）
