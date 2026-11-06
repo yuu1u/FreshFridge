@@ -1,5 +1,5 @@
 package com.example.freshfridge.viewmodel
-
+import com.example.freshfridge.data.LocalRecipe
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -167,5 +167,17 @@ class IngredientViewModel(application: Application) : AndroidViewModel(applicati
             _cookingCount.value =
                 cookingRecordRepository.getRecordCount()
         }
+    }
+    // ==================== AI 菜谱推荐结果管理 ====================
+
+    // 保存 AI 推荐的菜谱
+    private val _aiRecipes = MutableStateFlow<List<LocalRecipe>>(emptyList())
+
+    // 对外提供只读数据
+    val aiRecipes: StateFlow<List<LocalRecipe>> = _aiRecipes
+
+    // 更新 AI 推荐结果
+    fun updateAiRecipes(recipes: List<LocalRecipe>) {
+        _aiRecipes.value = recipes
     }
 }

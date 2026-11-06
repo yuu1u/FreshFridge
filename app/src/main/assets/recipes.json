@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "name": "西红柿炒鸡蛋",
+    "category": "家常炒菜",
+    "description": "经典家常菜，酸甜可口。",
+    "ingredients": [
+      {"name": "西红柿", "amount": "2个"},
+      {"name": "鸡蛋", "amount": "3个"}
+    ],
+    "steps": [
+      "西红柿洗净切块。",
+      "鸡蛋打散，锅中放油炒熟后盛出。",
+      "锅中放入西红柿炒出汁水。",
+      "加入鸡蛋翻炒均匀，调味后出锅。"
+    ],
+    "cookingTime": 15,
+    "difficulty": "简单",
+    "servings": 2,
+    "tags": ["家常菜", "下饭菜"]
+  },
+  {
+    "id": 2,
+    "name": "土豆炖牛肉",
+    "category": "牛肉类",
+    "description": "牛肉软烂，土豆吸收汤汁。",
+    "ingredients": [
+      {"name": "牛肉", "amount": "300g"},
+      {"name": "土豆", "amount": "2个"},
+      {"name": "胡萝卜", "amount": "1根"},
+      {"name": "洋葱", "amount": "半个"}
+    ],
+    "steps": [
+      "牛肉切块并焯水。",
+      "土豆、胡萝卜和洋葱切块。",
+      "锅中放油，加入牛肉和调料翻炒。",
+      "加入清水炖煮约40分钟。",
+      "加入土豆和胡萝卜继续炖煮至软烂。"
+    ],
+    "cookingTime": 60,
+    "difficulty": "中等",
+    "servings": 3,
+    "tags": ["炖菜", "下饭菜"]
+  },
+  {
+    "id": 3,
+    "name": "青椒炒肉",
+    "category": "猪肉类",
+    "description": "青椒爽脆，肉片鲜香。",
+    "ingredients": [
+      {"name": "猪肉", "amount": "200g"},
+      {"name": "青椒", "amount": "2个"}
+    ],
+    "steps": [
+      "猪肉切片，青椒切块。",
+      "锅中放油，先炒肉片。",
+      "加入青椒翻炒至断生。",
+      "加入调味料炒匀即可。"
+    ],
+    "cookingTime": 15,
+    "difficulty": "简单",
+    "servings": 2,
+    "tags": ["家常菜", "快手菜"]
+  }
+]
