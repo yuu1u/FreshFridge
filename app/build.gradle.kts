@@ -64,4 +64,6 @@ dependencies {
     // Room 数据库
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+    // 后台定时任务：用于每天自动检查食材过期情况
+    implementation("androidx.work:work-runtime-ktx:2.11.0")
 }

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- 网络访问权限 -->
+    <!-- 网络访问权限：DeepSeek API 使用 -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- 通知权限：Android 13 及以上版本需要动态申请 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"

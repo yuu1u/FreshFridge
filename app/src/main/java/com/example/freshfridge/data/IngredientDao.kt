@@ -15,6 +15,9 @@ interface IngredientDao {
     // 查询全部食材
     @Query("SELECT * FROM ingredients ORDER BY id DESC")
     fun getAllIngredients(): Flow<List<Ingredient>>
+    // 一次性查询全部食材（供后台任务使用）
+    @Query("SELECT * FROM ingredients")
+    suspend fun getAllIngredientsOnce(): List<Ingredient>
     // 查询食材总数
     @Query("SELECT COUNT(*) FROM ingredients")
     suspend fun getIngredientCount(): Int

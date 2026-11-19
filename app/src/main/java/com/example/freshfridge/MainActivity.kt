@@ -29,11 +29,24 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
-
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import com.example.freshfridge.worker.ExpiryWorkScheduler
+import com.example.freshfridge.worker.NotificationHelper
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 创建通知渠道
+        NotificationHelper.createNotificationChannel(this)
+
+        // 安排后台过期检查
+        ExpiryWorkScheduler.schedule(this)
 
         setContent {
             MaterialTheme {
@@ -81,7 +94,34 @@ private fun getDaysUntilExpiry(expiryDate: String): Long? {
 fun FreshFridgeApp() {
 
     val ingredientViewModel: IngredientViewModel = viewModel()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
+    val notificationPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { granted ->
+
+            if (granted) {
+                NotificationHelper.createNotificationChannel(context)
+            }
+        }
+
+    LaunchedEffect(Unit) {
+
+        if (Build.VERSION.SDK_INT >= 33) {
+
+            val granted = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!granted) {
+                notificationPermissionLauncher.launch(
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
+            }
+        }
+    }
     var currentScreen by rememberSaveable {
         mutableStateOf("home")
     }
@@ -99,9 +139,11 @@ fun FreshFridgeApp() {
     Scaffold(
         containerColor = Color(0xFFF5F8F3),
 
+        // 底部导航栏：保留四个栏目
         bottomBar = {
             NavigationBar {
 
+                // 首页
                 NavigationBarItem(
                     selected = currentScreen == "home",
                     onClick = {
@@ -111,6 +153,7 @@ fun FreshFridgeApp() {
                     label = { Text("首页") }
                 )
 
+                // 食材
                 NavigationBarItem(
                     selected = currentScreen == "ingredients",
                     onClick = {
@@ -120,6 +163,7 @@ fun FreshFridgeApp() {
                     label = { Text("食材") }
                 )
 
+                // 菜谱
                 NavigationBarItem(
                     selected = currentScreen == "recipes" ||
                             currentScreen == "recipe_detail",
@@ -131,6 +175,7 @@ fun FreshFridgeApp() {
                     label = { Text("菜谱") }
                 )
 
+                // 烹饪记录
                 NavigationBarItem(
                     selected = currentScreen == "history",
                     onClick = {
@@ -138,15 +183,6 @@ fun FreshFridgeApp() {
                     },
                     icon = { Text("📖") },
                     label = { Text("记录") }
-                )
-
-                NavigationBarItem(
-                    selected = currentScreen == "profile",
-                    onClick = {
-                        currentScreen = "profile"
-                    },
-                    icon = { Text("👤") },
-                    label = { Text("我的") }
                 )
             }
         }
@@ -256,16 +292,6 @@ fun FreshFridgeApp() {
                     CookingHistoryScreen(
                         viewModel = ingredientViewModel
                     )
-                }
-
-                // 我的页面
-                "profile" -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("个人中心正在开发中")
-                    }
                 }
             }
         }
