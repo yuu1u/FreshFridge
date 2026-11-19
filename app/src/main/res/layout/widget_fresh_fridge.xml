@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#F0F7ED">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🥬 FreshFridge 鲜冰箱"
+        android:textColor="#315B36"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/widget_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="食材总数：0"
+        android:textColor="#333333"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/widget_expiring"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="即将过期：0"
+        android:textColor="#E68A00"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/widget_expired"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="已经过期：0"
+        android:textColor="#D84343"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/widget_ingredient_names"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="暂无临期食材"
+        android:textColor="#555555"
+        android:textSize="13sp"/>
+
+</LinearLayout>
