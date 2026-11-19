@@ -22,6 +22,11 @@ fun IngredientScreen(
 ) {
     val ingredients by viewModel.allIngredients.collectAsStateWithLifecycle()
 
+    // 保存当前准备删除的食材
+    var ingredientToDelete by remember {
+        mutableStateOf<Ingredient?>(null)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -66,12 +71,57 @@ fun IngredientScreen(
                             onEditClick(ingredient)
                         },
                         onDeleteClick = {
-                            viewModel.deleteIngredient(ingredient)
+                            // 点击删除时，先显示确认弹窗
+                            ingredientToDelete = ingredient
                         }
                     )
                 }
             }
         }
+    }
+
+    // 删除确认弹窗
+    ingredientToDelete?.let { ingredient ->
+
+        AlertDialog(
+            onDismissRequest = {
+                ingredientToDelete = null
+            },
+
+            title = {
+                Text("确认删除")
+            },
+
+            text = {
+                Text(
+                    "确定要删除「${ingredient.name}」吗？删除后无法恢复。"
+                )
+            },
+
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteIngredient(ingredient)
+                        ingredientToDelete = null
+                    }
+                ) {
+                    Text(
+                        text = "确认删除",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        ingredientToDelete = null
+                    }
+                ) {
+                    Text("取消")
+                }
+            }
+        )
     }
 }
 
