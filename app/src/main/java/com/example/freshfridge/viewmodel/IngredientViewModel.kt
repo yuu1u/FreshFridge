@@ -1,13 +1,15 @@
 package com.example.freshfridge.viewmodel
-import com.example.freshfridge.data.LocalRecipe
+
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.freshfridge.CookingRecord
 import com.example.freshfridge.Ingredient
+import com.example.freshfridge.WidgetUpdateHelper
 import com.example.freshfridge.data.AppDatabase
 import com.example.freshfridge.data.CookingRecordRepository
 import com.example.freshfridge.data.IngredientRepository
+import com.example.freshfridge.data.LocalRecipe
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,17 +21,16 @@ import java.util.Locale
 
 class IngredientViewModel(application: Application) : AndroidViewModel(application) {
 
-    // ==================== 食材数据管理 ====================
-
+    // 食材数据库仓库
     private val repository = IngredientRepository(
         AppDatabase.getDatabase(application).ingredientDao()
     )
 
-    // 数据库中的食材总数
+    // 食材数量
     private val _ingredientCount = MutableStateFlow(0)
     val ingredientCount: StateFlow<Int> = _ingredientCount
 
-    // 观察数据库中的全部食材
+    // 所有食材列表
     val allIngredients: StateFlow<List<Ingredient>> =
         repository.allIngredients.stateIn(
             scope = viewModelScope,
@@ -37,8 +38,7 @@ class IngredientViewModel(application: Application) : AndroidViewModel(applicati
             initialValue = emptyList()
         )
 
-    // ==================== 烹饪记录管理 ====================
-
+    // 烹饪记录数据库仓库
     private val cookingRecordRepository = CookingRecordRepository(
         AppDatabase.getDatabase(application).cookingRecordDao()
     )
@@ -51,14 +51,15 @@ class IngredientViewModel(application: Application) : AndroidViewModel(applicati
             initialValue = emptyList()
         )
 
-    // 烹饪总次数
+    // 烹饪次数
     private val _cookingCount = MutableStateFlow(0)
     val cookingCount: StateFlow<Int> = _cookingCount
 
+    // 初始化
     init {
         viewModelScope.launch {
 
-            // 数据库为空时，自动添加初始食材
+            // 如果数据库为空，添加初始食材
             if (repository.getIngredientCount() == 0) {
 
                 val dateFormat = SimpleDateFormat(
@@ -110,73 +111,81 @@ class IngredientViewModel(application: Application) : AndroidViewModel(applicati
                 }
             }
 
-            // 更新食材总数
+            // 更新食材数量
             _ingredientCount.value = repository.getIngredientCount()
 
-            // 更新烹饪总次数
-            _cookingCount.value =
-                cookingRecordRepository.getRecordCount()
+            // 更新烹饪记录数量
+            _cookingCount.value = cookingRecordRepository.getRecordCount()
+
+            // 初始化完成后刷新桌面小组件
+            WidgetUpdateHelper.update(getApplication())
         }
     }
-
-    // ==================== 食材操作 ====================
 
     // 添加食材
     fun insertIngredient(ingredient: Ingredient) {
         viewModelScope.launch {
+
             repository.insertIngredient(ingredient)
+
             _ingredientCount.value = repository.getIngredientCount()
+
+            // 添加完成后刷新桌面小组件
+            WidgetUpdateHelper.update(getApplication())
         }
     }
 
     // 修改食材
     fun updateIngredient(ingredient: Ingredient) {
         viewModelScope.launch {
+
             repository.updateIngredient(ingredient)
+
             _ingredientCount.value = repository.getIngredientCount()
+
+            // 修改完成后刷新桌面小组件
+            WidgetUpdateHelper.update(getApplication())
         }
     }
 
     // 删除食材
     fun deleteIngredient(ingredient: Ingredient) {
         viewModelScope.launch {
+
             repository.deleteIngredient(ingredient)
+
             _ingredientCount.value = repository.getIngredientCount()
+
+            // 删除完成后刷新桌面小组件
+            WidgetUpdateHelper.update(getApplication())
         }
     }
-
-    // ==================== 烹饪记录操作 ====================
 
     // 添加烹饪记录
     fun insertCookingRecord(record: CookingRecord) {
         viewModelScope.launch {
+
             cookingRecordRepository.insertRecord(record)
 
-            // 更新烹饪总次数
-            _cookingCount.value =
-                cookingRecordRepository.getRecordCount()
+            _cookingCount.value = cookingRecordRepository.getRecordCount()
         }
     }
 
     // 删除烹饪记录
     fun deleteCookingRecord(recordId: Int) {
         viewModelScope.launch {
+
             cookingRecordRepository.deleteRecord(recordId)
 
-            // 更新烹饪总次数
-            _cookingCount.value =
-                cookingRecordRepository.getRecordCount()
+            _cookingCount.value = cookingRecordRepository.getRecordCount()
         }
     }
-    // ==================== AI 菜谱推荐结果管理 ====================
 
-    // 保存 AI 推荐的菜谱
+    // AI 菜谱数据
     private val _aiRecipes = MutableStateFlow<List<LocalRecipe>>(emptyList())
-
-    // 对外提供只读数据
     val aiRecipes: StateFlow<List<LocalRecipe>> = _aiRecipes
 
-    // 更新 AI 推荐结果
+    // 更新 AI 菜谱
     fun updateAiRecipes(recipes: List<LocalRecipe>) {
         _aiRecipes.value = recipes
     }
